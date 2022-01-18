@@ -10,11 +10,8 @@
 #define VECTOR_SIZE (2 << 12)
 
 //OpenCL kernel which is run for every work item created.
-
-
-int main(void) {
-  // Allocate space for vectors A, B and C
-  srand(42);
+//
+void launch_kernel(char *filename) {
   float *A = (float*)malloc(sizeof(float)*VECTOR_SIZE * VECTOR_SIZE);
   float *C = (float*)malloc(sizeof(float)*VECTOR_SIZE * VECTOR_SIZE);
   for(int i = 0; i < VECTOR_SIZE; i++)
@@ -26,7 +23,6 @@ int main(void) {
   }
 
   cl_int clStatus;
-  char *filename = "jacobi2d.cl";
   cl_info clInfo = init_cl_info(filename);
 
   // Create memory buffers on the device for each vector
@@ -69,5 +65,13 @@ fill_program_and_kernel(&clInfo);
   clean_cl_info(clInfo);
   free(A);
   free(C);
+}
+
+
+int main(void) {
+  // Allocate space for vectors A, B and C
+  srand(42);
+  launch_kernel("jacobi2d.cl");
   return 0;
 }
+
