@@ -8,12 +8,11 @@
 #include <CL/cl.h>
 #endif
 #define GS 128
-#define LS 8
 #define DIM 3
 
 //OpenCL kernel which is run for every work item created.
 //
-void launch_kernel(char *filename) {
+void launch_kernel(char *filename, size_t ls) {
   float *A = (float*)malloc(sizeof(float)*GS * GS*GS);
   float *C = (float*)malloc(sizeof(float)*GS * GS*GS);
   for(int i = 0; i < GS * GS * GS; i++)
@@ -25,7 +24,7 @@ void launch_kernel(char *filename) {
 
   // Execute the OpenCL kernel on the list
   size_t global_size[] = {GS, GS, GS}; // Process the entire lists
-  size_t local_size[] = {LS, LS, LS};           // Process one item at a time
+  size_t local_size[] = {ls, ls, ls};           // Process one item at a time
 
   cl_int clStatus;
   cl_info clInfo = init_cl_info(filename);
@@ -75,7 +74,8 @@ fill_program_and_kernel(&clInfo);
 int main(void) {
   // Allocate space for vectors A, B and C
   srand(42);
-  launch_kernel("jacobi3d.cl");
+  launch_kernel("jacobi3d.cl", 4);
+  launch_kernel("jacobi3d_opt0.cl", 4);
   return 0;
 }
 

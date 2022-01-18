@@ -105,7 +105,6 @@ cl_info init_cl_info(char *filename) {
   clInfo.device_list = get_device_list();
   get_context_and_command_queue(&clInfo.context, &clInfo.command_queue);
   clInfo.source = from_source(filename);
-  printf("%s\n", clInfo.source);
   return clInfo;
 }
 
