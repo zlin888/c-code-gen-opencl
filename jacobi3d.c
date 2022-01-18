@@ -76,6 +76,9 @@ int main(void) {
   srand(42);
   launch_kernel("jacobi3d.cl", 4);
   launch_kernel("jacobi3d_opt0.cl", 4);
+  launch_kernel("jacobi3d_opt1.cl", 4);
+  launch_kernel("jacobi3d_opt2.cl", 4);
+  launch_kernel("jacobi3d_opt3.cl", 4);
   return 0;
 }
 
