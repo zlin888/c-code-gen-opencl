@@ -1,12 +1,11 @@
-#define NX 1024
-#define NY 1024
+#define NX 4096
+#define NY 4096
 
 #define DEPTH 4
 
 /* Three dimensional Jacobi kernel */
 __kernel void cl_kernel(__global float * p_set, __global float * p_res) {        
     int pos_y = get_global_id(1);
-    printf("%d %d, ", pos_x, pos_y);
     
     if(pos_y % DEPTH == 0){
     	__global float (*set)[NY] = (__global float (*)[NY])p_set;

@@ -7,7 +7,8 @@
 #else
 #include <CL/cl.h>
 #endif
-#define VECTOR_SIZE (2 << 12)
+#define VECTOR_SIZE 4096
+#define LS 16
 
 //OpenCL kernel which is run for every work item created.
 //
@@ -39,11 +40,14 @@ fill_program_and_kernel(&clInfo);
 
   // Execute the OpenCL kernel on the list
   size_t global_size[] = {VECTOR_SIZE, VECTOR_SIZE}; // Process the entire lists
-  size_t local_size[] = {16, 16};           // Process one item at a time
+  size_t local_size[] = {LS, LS};           // Process one item at a time
+
   clStatus = clEnqueueNDRangeKernel(clInfo.command_queue, clInfo.kernel, 2, NULL, global_size, local_size, 0, NULL, &clInfo.event);
+  printf("kernel in\n");
 
   // Read the cl memory C_clmem on device to the host variable C
   clStatus = clEnqueueReadBuffer(clInfo.command_queue, C_clmem, CL_TRUE, 0, VECTOR_SIZE * VECTOR_SIZE * sizeof(float), C, 0, NULL, NULL);
+  printf("read buffer\n");
 
   // Clean up and wait for all the comands to complete.
   clStatus = clFlush(clInfo.command_queue);
@@ -72,6 +76,8 @@ int main(void) {
   // Allocate space for vectors A, B and C
   srand(42);
   launch_kernel("jacobi2d.cl");
+  launch_kernel("jacobi2d_opt0.cl");
+  launch_kernel("jacobi2d_opt1.cl");
   return 0;
 }
 

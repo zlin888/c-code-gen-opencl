@@ -1,5 +1,5 @@
-#define NX (2 << 12)
-#define NY (2 << 12) 
+#define NX 4096
+#define NY 4096
 
 __kernel 
 void cl_kernel(__global float * p_set, __global float * p_res) {

@@ -1,4 +1,4 @@
-#define VECTOR_SIZE 2048
+#define VECTOR_SIZE 4096
 
 __kernel
 void cl_kernel(__global float *A,
