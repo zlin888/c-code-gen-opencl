@@ -1,7 +1,7 @@
 #define VECTOR_SIZE 2048
 
 __kernel
-void saxpy_kernel(__global float *A,
+void cl_kernel(__global float *A,
                   __global float *C)
 {                                   
     int gi = get_global_id(0);   

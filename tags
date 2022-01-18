@@ -4,6 +4,33 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CL_info	include/helper.h	/^struct CL_info {$/;"	s
 VECTOR_SIZE	add.c	8;"	d	file:
+VECTOR_SIZE	jacobi1d.c	8;"	d	file:
+VECTOR_SIZE	jacobi1d_1.c	10;"	d	file:
+VECTOR_SIZE	jacobi1d_2.c	8;"	d	file:
+clStatus	include/helper.h	/^  cl_int clStatus;$/;"	m	struct:CL_info
+cl_info	include/helper.h	/^typedef struct CL_info cl_info;$/;"	t	typeref:struct:CL_info
+clean_cl_info	include/helper.h	/^void clean_cl_info(cl_info clInfo) {$/;"	f
+command_queue	include/helper.h	/^  cl_command_queue command_queue;$/;"	m	struct:CL_info
+context	include/helper.h	/^  cl_context context;$/;"	m	struct:CL_info
+device_list	include/helper.h	/^  cl_device_id *device_list;$/;"	m	struct:CL_info
+event	include/helper.h	/^  cl_event event;$/;"	m	struct:CL_info
+fill_program_and_kernel	include/helper.h	/^void fill_program_and_kernel(cl_info *clInfo) {$/;"	f
+from_source	include/helper.h	/^char* from_source(char* filename) {$/;"	f
+get_context_and_command_queue	include/helper.h	/^void get_context_and_command_queue(cl_context *context, cl_command_queue *command_queue) {$/;"	f
+get_device_list	include/helper.h	/^cl_device_id* get_device_list() {$/;"	f
+get_device_num	include/helper.h	/^cl_uint get_device_num() {$/;"	f
+init_cl_info	include/helper.h	/^cl_info init_cl_info(char *filename) {$/;"	f
+kernel	include/helper.h	/^  cl_kernel kernel;$/;"	m	struct:CL_info
 main	add.c	/^int main(void) {$/;"	f
+main	include/helper_test.c	/^int main() {$/;"	f
+main	jacobi1d.c	/^int main(void) {$/;"	f
+main	jacobi1d_1.c	/^int main(void) {$/;"	f
+main	jacobi1d_2.c	/^int main(void) {$/;"	f
+print_runtime	include/helper.h	/^void print_runtime(cl_event event) {$/;"	f
+program	include/helper.h	/^  cl_program program;$/;"	m	struct:CL_info
 saxpy_kernel	add.c	/^const char *saxpy_kernel =$/;"	v
+saxpy_kernel	jacobi1d.c	/^const char *saxpy_kernel =$/;"	v
+saxpy_kernel	jacobi1d_2.c	/^const char *saxpy_kernel =$/;"	v
+source	include/helper.h	/^  char *source;$/;"	m	struct:CL_info
