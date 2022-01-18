@@ -2,22 +2,23 @@
 #define NY 128
 #define NZ 128
 
-#define DIM_X 4
-#define DIM_Y 4
-#define DIM_Z 4
+#define DIM_X 8
+#define DIM_Y 8
+#define DIM_Z 8
 
 /* Three dimensional Jacobi kernel */
 __kernel void cl_kernel(__global float * p_set, __global float * p_res) {
     __global float (*set)[NY][NZ] = (__global float (*)[NY][NZ])p_set;
     __global float (*res)[NY][NZ] = (__global float (*)[NY][NZ])p_res;
+    __local float item[DIM_X][DIM_Y][DIM_Z];
     int g_x = get_global_id(0);
     int g_y = get_global_id(1);
     int g_z = get_global_id(2);
+
     int l_x = get_local_id(0);
     int l_y = get_local_id(1);
     int l_z = get_local_id(2);   
     
-    __local float p_item[DIM_X][DIM_Y][DIM_Z];
     item[l_x][l_y][l_z] = set[g_x][g_y][g_z];
     barrier(CLK_LOCAL_MEM_FENCE);
     
