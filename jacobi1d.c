@@ -1,28 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "include/helper.h"
+
 #ifdef __APPLE__
 #include <OpenCL/cl.h>
 #else
 #include <CL/cl.h>
 #endif
-#define VECTOR_SIZE 1024
+#define VECTOR_SIZE 2048
 
 //OpenCL kernel which is run for every work item created.
-const char *saxpy_kernel =
-"__kernel void _jacobi(__global float *set, __global float *res) {           \n"
-"    int pos_x = get_global_id(0);                                           \n"
-"                                                                            \n"  
-"    if(pos_x > 0 && pos_x < 1023){                                        \n" 
-"    	res[pos_x] = (set[pos_x-1] + set[pos_x] + set[pos_x+1]) * 0.33333333;\n" 
-"    }                                                                       \n"
-"}                                                                           \n"; 
 
 
 int main(void) {
   int i;
-  srand(42);
   // Allocate space for vectors A, B and C
-  float alpha = 2.0;
+  srand(42);
   float *A = (float*)malloc(sizeof(float)*VECTOR_SIZE);
   float *C = (float*)malloc(sizeof(float)*VECTOR_SIZE);
   for(i = 0; i < VECTOR_SIZE; i++)
@@ -31,97 +24,40 @@ int main(void) {
     C[i] = 0;
   }
 
-  // Get platform and device information
-  cl_platform_id * platforms = NULL;
-  cl_uint     num_platforms;
-  //Set up the Platform
-  cl_int clStatus = clGetPlatformIDs(0, NULL, &num_platforms);
-  platforms = (cl_platform_id *)malloc(sizeof(cl_platform_id)*num_platforms);
-  clStatus = clGetPlatformIDs(num_platforms, platforms, NULL);
-
-  //Get the devices list and choose the device you want to run on
-  cl_device_id     *device_list = NULL;
-  cl_uint           num_devices;
-
-  clStatus = clGetDeviceIDs( platforms[0], CL_DEVICE_TYPE_GPU, 0,NULL, &num_devices);
-  device_list = (cl_device_id *)malloc(sizeof(cl_device_id)*num_devices);
-  clStatus = clGetDeviceIDs( platforms[0],CL_DEVICE_TYPE_GPU, num_devices, device_list, NULL);
-
-  // Create one OpenCL context for each device in the platform
-  cl_context context;
-  context = clCreateContext( NULL, num_devices, device_list, NULL, NULL, &clStatus);
-
-  // Create a command queue
-  cl_command_queue command_queue = clCreateCommandQueue(context, device_list[0], CL_QUEUE_PROFILING_ENABLE, &clStatus);
+  cl_int clStatus;
+  char *filename = "jacobi1d.cl";
+  cl_info clInfo = init_cl_info(filename);
 
   // Create memory buffers on the device for each vector
-  cl_mem A_clmem = clCreateBuffer(context, CL_MEM_READ_WRITE,VECTOR_SIZE * sizeof(float), NULL, &clStatus);
-  cl_mem C_clmem = clCreateBuffer(context, CL_MEM_READ_WRITE,VECTOR_SIZE * sizeof(float), NULL, &clStatus);
-  if (clStatus != CL_SUCCESS) printf("FAIL");
+  cl_mem A_clmem = clCreateBuffer(clInfo.context, CL_MEM_READ_ONLY,VECTOR_SIZE * sizeof(float), NULL, &clStatus);
+  cl_mem C_clmem = clCreateBuffer(clInfo.context, CL_MEM_WRITE_ONLY,VECTOR_SIZE * sizeof(float), NULL, &clStatus);
 
   // Copy the Buffer A and B to the device
-  clStatus = clEnqueueWriteBuffer(command_queue, A_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), A, 0, NULL, NULL);
+  clStatus = clEnqueueWriteBuffer(clInfo.command_queue, A_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), A, 0, NULL, NULL);
 
-  // Create a program from the kernel source
-  cl_program program = clCreateProgramWithSource(context, 1,(const char **)&saxpy_kernel, NULL, &clStatus);
-
-  // Build the program
-  clStatus = clBuildProgram(program, 1, device_list, NULL, NULL, NULL);
-
-  // Create the OpenCL kernel
-  cl_kernel kernel = clCreateKernel(program, "saxpy_kernel", &clStatus);
-
+fill_program_and_kernel(&clInfo);
   // Set the arguments of the kernel
-  clStatus = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&A_clmem);
-  clStatus = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&C_clmem);
+  clStatus = clSetKernelArg(clInfo.kernel, 0, sizeof(cl_mem), (void *)&A_clmem);
+  clStatus = clSetKernelArg(clInfo.kernel, 1, sizeof(cl_mem), (void *)&C_clmem);
 
   // Execute the OpenCL kernel on the list
   size_t global_size = VECTOR_SIZE; // Process the entire lists
   size_t local_size = 16;           // Process one item at a time
-
-  cl_event event;
-  clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, &event);
+  clStatus = clEnqueueNDRangeKernel(clInfo.command_queue, clInfo.kernel, 1, NULL, &global_size, &local_size, 0, NULL, &clInfo.event);
 
   // Read the cl memory C_clmem on device to the host variable C
-  clStatus = clEnqueueReadBuffer(command_queue, C_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), C, 0, NULL, NULL);
-  if (clStatus != CL_SUCCESS) printf("FAIL");
-
-
-  clStatus = clFlush(command_queue);
+  clStatus = clEnqueueReadBuffer(clInfo.command_queue, C_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), C, 0, NULL, NULL);
 
   // Clean up and wait for all the comands to complete.
-  clStatus = clFinish(command_queue);
-  clWaitForEvents(1, &event);
+  clStatus = clFlush(clInfo.command_queue);
+  clStatus = clFinish(clInfo.command_queue);
 
- // cl_ulong time_start;
- // cl_ulong time_end;
+  print_runtime(clInfo.event);
 
- // clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(time_start), &time_start, NULL);
- // clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(time_end), &time_end, NULL);
-
- // double nanoSeconds = time_end-time_start;
- // printf("OpenCl Execution time is: %0.3f milliseconds \n", nanoSeconds / 1000000.0);
-
- // // Display the result to the screen
- 
-  for(i = 0; i < VECTOR_SIZE; i++)
-   printf("%f ", C[i]);
-
- printf("\n");
- for(i = 0; i < VECTOR_SIZE; i++)
-   printf("%f ", A[i]);
- printf("\n");
-
-  // Finally release all OpenCL allocated objects and host buffers.
-  clStatus = clReleaseKernel(kernel);
-  clStatus = clReleaseProgram(program);
   clStatus = clReleaseMemObject(A_clmem);
   clStatus = clReleaseMemObject(C_clmem);
-  clStatus = clReleaseCommandQueue(command_queue);
-  clStatus = clReleaseContext(context);
+  clean_cl_info(clInfo);
   free(A);
   free(C);
-  free(platforms);
-  free(device_list);
   return 0;
 }

@@ -6,7 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 CL_info	include/helper.h	/^struct CL_info {$/;"	s
 VECTOR_SIZE	add.c	8;"	d	file:
-VECTOR_SIZE	jacobi1d.c	8;"	d	file:
+VECTOR_SIZE	jacobi1d.c	10;"	d	file:
 VECTOR_SIZE	jacobi1d_1.c	10;"	d	file:
 VECTOR_SIZE	jacobi1d_2.c	8;"	d	file:
 clStatus	include/helper.h	/^  cl_int clStatus;$/;"	m	struct:CL_info
@@ -31,6 +31,5 @@ main	jacobi1d_2.c	/^int main(void) {$/;"	f
 print_runtime	include/helper.h	/^void print_runtime(cl_event event) {$/;"	f
 program	include/helper.h	/^  cl_program program;$/;"	m	struct:CL_info
 saxpy_kernel	add.c	/^const char *saxpy_kernel =$/;"	v
-saxpy_kernel	jacobi1d.c	/^const char *saxpy_kernel =$/;"	v
 saxpy_kernel	jacobi1d_2.c	/^const char *saxpy_kernel =$/;"	v
 source	include/helper.h	/^  char *source;$/;"	m	struct:CL_info
