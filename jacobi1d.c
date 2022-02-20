@@ -7,12 +7,11 @@
 #else
 #include <CL/cl.h>
 #endif
-#define VECTOR_SIZE 2048
+#define VECTOR_SIZE 4096
 
 //OpenCL kernel which is run for every work item created.
 
-
-int main(void) {
+void launch_kernel(char *filename) {
   int i;
   // Allocate space for vectors A, B and C
   srand(42);
@@ -25,7 +24,6 @@ int main(void) {
   }
 
   cl_int clStatus;
-  char *filename = "jacobi1d.cl";
   cl_info clInfo = init_cl_info(filename);
 
   // Create memory buffers on the device for each vector
@@ -54,10 +52,25 @@ fill_program_and_kernel(&clInfo);
 
   print_runtime(clInfo.event);
 
+  for (int i = 0; i < 10; i++) {
+      printf("%f, ", A[i]);
+  }
+  printf("\n");
+
+  for (int i = 0; i < 10; i++) {
+      printf("%f, ", C[i]);
+  }
+  printf("\n");
+
   clStatus = clReleaseMemObject(A_clmem);
   clStatus = clReleaseMemObject(C_clmem);
   clean_cl_info(clInfo);
   free(A);
   free(C);
+}
+
+int main(void) {
+  launch_kernel("jacobi1d_gen.cl");
+  launch_kernel("jacobi1d.cl");
   return 0;
 }
