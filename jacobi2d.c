@@ -78,6 +78,7 @@ int main(void) {
   launch_kernel("jacobi2d.cl");
   launch_kernel("jacobi2d_opt0.cl");
   launch_kernel("jacobi2d_opt1.cl");
+  launch_kernel("jacobi2D_opencl.h");
   return 0;
 }
 

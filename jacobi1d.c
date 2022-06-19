@@ -39,12 +39,13 @@ fill_program_and_kernel(&clInfo);
   clStatus = clSetKernelArg(clInfo.kernel, 1, sizeof(cl_mem), (void *)&C_clmem);
 
   // Execute the OpenCL kernel on the list
-  size_t global_size = VECTOR_SIZE; // Process the entire lists
+  size_t global_size = VECTOR_SIZE ; // Process the entire lists
   size_t local_size = 16;           // Process one item at a time
   clStatus = clEnqueueNDRangeKernel(clInfo.command_queue, clInfo.kernel, 1, NULL, &global_size, &local_size, 0, NULL, &clInfo.event);
 
   // Read the cl memory C_clmem on device to the host variable C
   clStatus = clEnqueueReadBuffer(clInfo.command_queue, C_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), C, 0, NULL, NULL);
+
 
   // Clean up and wait for all the comands to complete.
   clStatus = clFlush(clInfo.command_queue);
@@ -70,7 +71,8 @@ fill_program_and_kernel(&clInfo);
 }
 
 int main(void) {
-  launch_kernel("jacobi1d_gen.cl");
+  //launch_kernel("jacobi1d_gen.cl");
   launch_kernel("jacobi1d.cl");
+  launch_kernel("jacobi1D_opencl.h");
   return 0;
 }
